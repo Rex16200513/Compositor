@@ -1,0 +1,24 @@
+name: Build preview app
+on:
+  push:
+    branches: [build/export-presets-preview]
+permissions:
+  contents: read
+jobs:
+  app:
+    runs-on: macos-26
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+      - run: sudo xcode-select -s /Applications/Xcode_26.6.app
+      - run: xcodebuild -project Compositor.xcodeproj -scheme Compositor -configuration Debug -destination 'platform=macOS,arch=arm64' -derivedDataPath DerivedData CODE_SIGN_IDENTITY=- GCC_OPTIMIZATION_LEVEL=s SWIFT_OPTIMIZATION_LEVEL=-O build > build.log 2>&1
+      - run: ditto -c -k --sequesterRsrc --keepParent DerivedData/Build/Products/Debug/Compositor.app Compositor-export-presets.zip
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Compositor-export-presets
+          path: Compositor-export-presets.zip
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: build-log
+          path: build.log
