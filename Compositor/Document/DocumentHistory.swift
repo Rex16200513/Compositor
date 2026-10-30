@@ -59,6 +59,9 @@ final class DocumentHistory {
         depth += 1
     }
 
+    /// The document as it was when the edit now ending began, if this is its outermost `end`.
+    var endingEditBefore: CanvasDocument? { depth == 1 ? pending?.document : nil }
+
     func end(document: CanvasDocument?, selection: UUID?) {
         guard depth > 0 else { return }
         depth -= 1

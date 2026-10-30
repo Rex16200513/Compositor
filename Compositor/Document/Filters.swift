@@ -1015,9 +1015,9 @@ extension EditorSession {
             let grown = keepsOutline ? nil : edit.grownTransform
             let spreads = edit.kind == .gaussianBlur || edit.kind == .motionBlur || edit.kind == .progressiveBlur || edit.kind == .bloomGlow
             // A 16-bit layer runs the filter on its 16-bit pixels, padded as the 8-bit ones were (`DeepLayer.run`).
-            // These rasterize the layer to 8-bit instead: Content-Aware Fill makes new pixels from scratch; Dither's
-            // result is a few levels by design (three runs read between would mix its patterns into colors); Remove
-            // Background would find the subject three times over.
+            // These work on the 8-bit pixels instead, and the layer is made 16-bit again after (`keepLayerDepths`):
+            // Content-Aware Fill makes new pixels from scratch; Dither's result is a few levels by design (three runs read
+            // between would mix its patterns into colors); Remove Background would find the subject three times over.
             let rasterizes = edit.kind == .contentAwareFill || edit.kind == .dither || edit.kind == .removeBackground
             let deep = rasterizes ? nil : try DeepLayer.flattened(edit.original)
             let deepGrid = keepsOutline ? nil : edit.grownImage.flatMap { grownImage in
